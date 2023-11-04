@@ -79,12 +79,12 @@ cdef bstate* ordered_basis(int bosons, int sites):
 
     # Sort the combinations in lexicographic order
     combinations = sorted(combinations)
-    cdef int length = len(combinations)
+    cdef size_t length = len(combinations)
 
     # Create basis vectors from the sorted combinations
     cdef bstate* basis_vectors = <bstate*>malloc(length*sizeof(bstate))
     
-    cdef int i
+    cdef size_t i
     for i in range(length):
         basis_vectors[i] = create_bosons("0" * sites, sites)  # Initialize with all zeros
         
@@ -104,7 +104,7 @@ cdef bstate create_bosons(str state, int space_size):
         raise MemoryError("Failed to allocate memory for state_array")
     
     for i in range(space_size):
-        if state[i] < 0:
+        if <int>state[i] < 0:
             raise ValueError("no negative occupation numbers for bosonic states")
         state_array[i] = <int>state[i]-48 #minus 48 because of ascii encoding from str to int. 0 is 48 in ascii. 1 is 49
     cdef bstate result
@@ -240,7 +240,7 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
 cpdef double[:,::1] Bose_Hubbard(int bosons, int sites, double t, double U, double nu):
     cdef int h_size = bosonic_basis_size(bosons, sites)
     cdef bstate* basis = ordered_basis(bosons, sites)
-    cdef double[:,::1] hamiltonian = np.zeros((h_size, h_size), dtype=np.float64)
+    cdef double[:,::1] hamiltonian = np.zeros((h_size, h_size), dtype=np.double)
     interacting_boson_gas(bosons, sites, t, U, nu, basis, hamiltonian, h_size)
     cdef size_t i
     for i in range(h_size):
@@ -248,3 +248,4 @@ cpdef double[:,::1] Bose_Hubbard(int bosons, int sites, double t, double U, doub
     free(basis)
     basis = NULL
     return hamiltonian
+

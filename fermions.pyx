@@ -34,7 +34,8 @@ cpdef void print_fstate(fstate in_state):
     print(format(in_state.state, '0'+str(in_state.size)+'b'),"\n")
     
     
-
+cdef void print_state(fstate in_state):
+    print(format(in_state.state, '0'+str(in_state.size)+'b'),"\n")
     
 ##########
 ##########
@@ -56,8 +57,8 @@ cdef inline char has_occupation(fstate in_state, int site) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef int count_ones(fstate in_state, int in_index) nogil:
-    cdef int count = 0
-    cdef int mask = 1
+    cdef unsigned int count = 0
+    cdef unsigned int mask = 1
     # Adjust the mask to consider the last site relevant digits
     mask = mask << (in_state.size - in_index)
     for i in range(in_index-1):
@@ -88,7 +89,7 @@ cdef fstate flip(fstate in_state, int flip_site) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef fstate* get_basis(int nr_fermions, int nr_sites):
-    basis_size = comb(nr_sites, nr_fermions)
+    cdef unsigned int basis_size = comb(nr_sites, nr_fermions)
     cdef fstate* basis = <fstate*>malloc(sizeof(fstate) * basis_size)
     cdef unsigned int i, state
     # Initialize state with the first combination of nr_fermions set bits
@@ -225,7 +226,8 @@ cdef inline void fermi_hamiltonian(double[:,::1] array, fstate* basis, int nr_fe
     for i in range(basis_size):
         for j in range(basis_size):
             for k in range(nr_sites):
-                array[i, j] = array[i, j] + t*contract_fstates(basis[i], apply_fcreator_nospin(apply_fannahilator_nospin(basis[j], (k+2)%nr_sites), (k+1)%nr_sites)) +\
+                array[i, j] = array[i, j] +\
+                t*contract_fstates(basis[i], apply_fcreator_nospin(apply_fannahilator_nospin(basis[j], (k+2)%nr_sites), (k+1)%nr_sites)) +\
                 t*contract_fstates(basis[i], apply_fcreator_nospin(apply_fannahilator_nospin(basis[j], (k+1)%nr_sites), (k+2)%nr_sites)) +\
                 U*contract_fstates(basis[i], number_operator(basis[j], k+1))
                 
@@ -267,3 +269,5 @@ cpdef double[:,:] XXX(double Jx, double hz, int N):
             Jx*np.matmul(get_paulix_j((j%N)+1, N), get_paulix_j((j+1)%N+1, N)) +\
             np.multiply(hz, get_pauliz_j(j+1, N))
     return result
+
+
