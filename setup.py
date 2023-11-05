@@ -5,13 +5,13 @@ import numpy
 
 extensions = [
     Extension(
-        name='bose_hubbard',
-        sources=['bose_hubbard.pyx'],
+        name='bosons',
+        sources=['bosons.pyx'],
         include_dirs=[numpy.get_include()],
     ),
     Extension(
-        name='fermi_hubbard',
-        sources=['fermi_hubbard.pyx'],
+        name='fermions',
+        sources=['fermions.pyx'],
         include_dirs=[numpy.get_include()],
     ),
 ]
