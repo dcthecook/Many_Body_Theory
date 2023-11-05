@@ -2,7 +2,12 @@
 """
 Created on Thu Oct 19 18:12:22 2023
 
-@author: Enea
+@author: Enea Çobo
+
+The following Code is intended as a package for Quantum Calculations
+regarding bosonic systems in second quantization form. Currently present is only
+1 function for 1 specific Hamiltonian. The general Bose-Hubbard under a chemical 
+potential.
 """
 ##########
 ##########
@@ -82,37 +87,25 @@ cdef bstate* ordered_basis(int bosons, int sites):
     combinations = sorted(combinations)
     cdef size_t length = len(combinations)
 
-    # Create basis vectors from the sorted combinations
-    cdef bstate* basis_vectors = <bstate*>malloc(length*sizeof(bstate))
+    # Create basis vectors directly from the list of states
+    cdef bstate* basis_vectors = <bstate*>malloc(length * sizeof(bstate))
     
-    cdef size_t i
+    cdef size_t i, j
     for i in range(length):
-        basis_vectors[i] = create_bosons("0" * sites, sites)  # Initialize with all zeros
-        
-        for site in combinations[i]:
-            basis_vectors[i].state[site] += 1
-            #basis_vectors[i].norm_const = sqrt(<double>basis_vectors[i].state[site]) needed ???? check theory books
+        basis_vectors[i].state = <int*>malloc(sites * sizeof(int))
+        for j in range(sites):
+            basis_vectors[i].state[j] = 0
+
+        for j in combinations[i]:
+            basis_vectors[i].state[j] += 1
+
+        basis_vectors[i].size = sites
+        basis_vectors[i].norm_const = 1.0
+        #basis_vectors[i].norm_const = sqrt(<double>basis_vectors[i].state[site]) needed ???? check theory books
+
     return basis_vectors
 
 
-
-##
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef bstate create_bosons(str state, int space_size):
-    cdef int* state_array = <int*>malloc(space_size*sizeof(int))
-    if state_array is NULL:
-        raise MemoryError("Failed to allocate memory for state_array")
-    
-    for i in range(space_size):
-        if <int>state[i] < 0:
-            raise ValueError("no negative occupation numbers for bosonic states")
-        state_array[i] = <int>state[i]-48 #minus 48 because of ascii encoding from str to int. 0 is 48 in ascii. 1 is 49
-    cdef bstate result
-    result.state = state_array
-    result.size = space_size
-    result.norm_const = 1.
-    return result
 
 
 ##
@@ -249,12 +242,4 @@ cpdef double[:,::1] Bose_Hubbard(int bosons, int sites, double t, double U, doub
     free(basis)
     basis = NULL
     return hamiltonian
-
-
-#test_object = Bose_Hubbard(2, 5, 0.5, -0.188, 0.01)
-#plt.style.use('dark_background')
-#plt.figure(figsize=(15,15))
-#plt.imshow(test_object, cmap='terrain')
-
-
 

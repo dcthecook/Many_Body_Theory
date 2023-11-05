@@ -2,7 +2,13 @@
 """
 Created on Fri Oct 27 00:15:25 2023
 
-@author: Enea
+@author: Enea Çobo
+
+The following Code is intended as a package for Quantum Calculations
+regarding fermionic systems in second quantization form. Currently present are
+3 functions for 3 specific Hamiltonians. The general Fermi-Hubbard model, the general
+Heisenberg model and the XXX model with an interaction in the z axis 
+potential.
 """
 ##########
 ##########
@@ -218,13 +224,13 @@ cdef double[:,:] get_pauliz_j(int j, int N):
 ##########
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef inline void fermi_hamiltonian(double[:,::1] array, fstate* basis, int nr_fermions, int nr_sites, double t, double U, int basis_size) nogil:
+cdef inline void fermi_hamiltonian(double[:,::1] arr, fstate* basis, int nr_fermions, int nr_sites, double t, double U, int basis_size) nogil:
     cdef size_t i, j
     cdef int k
     for i in range(basis_size):
         for j in range(basis_size):
             for k in range(nr_sites):
-                array[i, j] = array[i, j] +\
+                arr[i, j] = arr[i, j] +\
                 t*contract_fstates(basis[i], apply_fcreator_nospin(apply_fannahilator_nospin(basis[j], (k+2)%nr_sites), (k+1)%nr_sites)) +\
                 t*contract_fstates(basis[i], apply_fcreator_nospin(apply_fannahilator_nospin(basis[j], (k+1)%nr_sites), (k+2)%nr_sites)) +\
                 U*contract_fstates(basis[i], number_operator(basis[j], k+1))
@@ -259,7 +265,7 @@ cpdef double[:,::1] Heisenberg(double Jx, double Jy, double Jz, double hx, doubl
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef double[:,::1] XXX(double Jx, double hz, int N):
-    cdef double[:,::1] result = np.zeros((2**N, 2**N), dtype=np.double)
+    cdef double[:,::1] result = np.zeros((<int>2**N, <int>2**N), dtype=np.double)
     cdef int j, nr_sites
     nr_sites = N
     for j in range(nr_sites):
