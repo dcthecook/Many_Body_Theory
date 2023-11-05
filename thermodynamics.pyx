@@ -13,3 +13,6 @@ Created on Sat Nov  4 08:42:21 2023
 # work in progress
 ###############
 ###############
+
+# cdef partition_function(**kwargs):
+    #return ...

@@ -14,7 +14,7 @@ from libc.stdlib cimport malloc, free
 from libc.math cimport sqrt
 from cython cimport sizeof
 from itertools import combinations_with_replacement
-
+import matplotlib.pyplot as plt
 
 import numpy as np
 cimport numpy as np
@@ -238,7 +238,7 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef double[:,::1] Bose_Hubbard(int bosons, int sites, double t, double U, double nu):
-    cdef int h_size = bosonic_basis_size(bosons, sites)
+    cdef int h_size = <int>bosonic_basis_size(bosons, sites)
     cdef bstate* basis = ordered_basis(bosons, sites)
     cdef double[:,::1] hamiltonian = np.zeros((h_size, h_size), dtype=np.double)
     interacting_boson_gas(bosons, sites, t, U, nu, basis, hamiltonian, h_size)
@@ -248,4 +248,12 @@ cpdef double[:,::1] Bose_Hubbard(int bosons, int sites, double t, double U, doub
     free(basis)
     basis = NULL
     return hamiltonian
+
+
+#test_object = Bose_Hubbard(2, 5, 0.5, -0.188, 0.01)
+#plt.style.use('dark_background')
+#plt.figure(figsize=(15,15))
+#plt.imshow(test_object, cmap='terrain')
+
+
 

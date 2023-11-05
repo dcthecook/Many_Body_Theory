@@ -33,9 +33,7 @@ ctypedef struct fstate:
 cpdef void print_fstate(fstate in_state):
     print(format(in_state.state, '0'+str(in_state.size)+'b'),"\n")
     
-    
-cdef void print_state(fstate in_state):
-    print(format(in_state.state, '0'+str(in_state.size)+'b'),"\n")
+
     
 ##########
 ##########
@@ -244,14 +242,14 @@ cpdef double[:,::1] Fermi_Hubbard(int fermions, int sites, double t, double U):
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef double[:,:] Heisenberg(double Jx, double Jy, double Jz, double hx, double hy, double hz, int N):
-    cdef double[:,:] result = np.zeros((2**N, 2**N), dtype=np.cdouble)
+cpdef double[:,::1] Heisenberg(double Jx, double Jy, double Jz, double hx, double hy, double hz, int N):
+    cdef double[:,::1] result = np.zeros((<int>2**N, <int>2**N), dtype=np.cdouble)
     cdef int j, nr_sites
     nr_sites = N
     for j in range(nr_sites):
         result = result +\
             Jx*np.matmul(get_paulix_j((j%N)+1, N), get_paulix_j((j+1)%N+1, N)) +\
-            Jy*np.matmul(get_pauliy_j((j%N)+1, N), get_pauliy_j((j+1)%N+1, N))+\
+            Jy*np.matmul(get_pauliy_j((j%N)+1, N), get_pauliy_j((j+1)%N+1, N)) +\
             Jz*np.matmul(get_pauliz_j((j%N)+1, N), get_pauliz_j((j+1)%N+1, N)) +\
             np.multiply(hx, get_paulix_j(j+1, N)) +\
             np.multiply(hy, get_pauliy_j(j+1, N)) +\
@@ -260,8 +258,8 @@ cpdef double[:,:] Heisenberg(double Jx, double Jy, double Jz, double hx, double 
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cpdef double[:,:] XXX(double Jx, double hz, int N):
-    cdef double[:,:] result = np.zeros((2**N, 2**N), dtype=np.double)
+cpdef double[:,::1] XXX(double Jx, double hz, int N):
+    cdef double[:,::1] result = np.zeros((2**N, 2**N), dtype=np.double)
     cdef int j, nr_sites
     nr_sites = N
     for j in range(nr_sites):
