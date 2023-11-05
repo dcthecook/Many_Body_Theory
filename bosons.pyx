@@ -31,7 +31,8 @@ cdef void free_bosons(bstate in_state) nogil:
     in_state.state = NULL
 
   
-##
+## DO NOT CALL ! Gives int overflow for large numbers
+## Use function below
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef int factorial(int a, int start) nogil:
@@ -120,7 +121,7 @@ cdef bstate create_bosons(str state, int space_size):
 cdef inline bstate apply_creator(bstate in_state, int site) nogil:
     if site <= 0:
         raise ValueError("site number negative or 0")
-    #index = site-1
+    #index = site-1 due physics notation
     cdef int i
     cdef bstate cresult
     cresult.size = in_state.size
@@ -136,7 +137,7 @@ cdef inline bstate apply_creator(bstate in_state, int site) nogil:
 cdef inline bstate apply_annahilator(bstate in_state, int site) nogil:
     if site <= 0:
         raise ValueError("site number negative or 0")
-    #index = site-1
+    #index = site-1 due physics notation
     cdef bstate aresult
     aresult.size = in_state.size
     aresult.state = <int*>malloc(in_state.size*sizeof(int))
@@ -154,7 +155,7 @@ cdef inline bstate apply_annahilator(bstate in_state, int site) nogil:
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef inline bstate number_operator(bstate in_state, int site, int power) nogil:
-    #index = site-1
+    #index = site-1 due physics notation
     cdef bstate nresult
     nresult.size = in_state.size
     nresult.state = <int*>malloc(in_state.size*sizeof(int))
@@ -185,13 +186,13 @@ cdef inline double contract_states(bstate state1, bstate state2) nogil:
         return result
     else:
         return 0.
-    #free_bosons(state1)
+    #free_bosons(state1) not needed. 
     #free_bosons(state2)
 
 
 ##########
 ##########
-# The main getter method for the hamiltonian and its CPython call function for future imports
+# The main calculating method for the hamiltonian and its CPython call function for future imports
 # interacting_boson_gas simply takes a matrix as input and iterates through the elements
 # It then changes them according to which basis states are contracted with the Hamiltonian operator
 # The summation over the Hopping term and Potential term are added for each element.
@@ -206,10 +207,10 @@ cdef inline double contract_states(bstate state1, bstate state2) nogil:
 @cython.wraparound(False)
 cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U, double nu, bstate* basis, double[:,::1] nparr, int h_size) nogil:
     cdef bstate tmp_state1  #troubleshoot purposes
-    cdef bstate tmp_state2
-    cdef bstate tmp_state3
-    cdef bstate tmp_state4
-    cdef bstate tmp_state5
+    cdef bstate tmp_state2  #these extra tmp statements are needed
+    cdef bstate tmp_state3  #because they would be performed ANYWAY
+    cdef bstate tmp_state4  #if the creation/ann operators would be coded
+    cdef bstate tmp_state5  #the other way %_% so better keep track here
     
     cdef int i, j, k
     for i in range(h_size):
