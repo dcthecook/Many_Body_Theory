@@ -36,18 +36,17 @@ cpdef void print_fstate(fstate in_state):
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef int count_ones(fstate in_fstate, int in_index) nogil:
-    cdef unsigned int up_count = 0
-    cdef unsigned int down_count = 0
+    cdef unsigned int count = 0
     cdef unsigned int mask = 1
     # Adjust the mask to consider the last site relevant digits
     mask = mask << (in_fstate.size - in_index)
     for i in range(in_index-1):
         mask = mask << 1
         if in_fstate.state & mask:
-            up_count = up_count + 1
+            count = count + 1
         if (2*in_fstate.state<<in_fstate.state) & mask:
-                down_count = down_count + 1
-    return down_count + up_count
+            count = count + 1
+    return count
 
 #test
 cdef fstate test
