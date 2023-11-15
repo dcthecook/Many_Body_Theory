@@ -72,7 +72,7 @@ cdef int bosonic_basis_size(int bosons, int sites) nogil:
     return result
 
 
-##
+## To Find the basis size of the system
 cpdef int basis_size_python(int nrbosons, int nrsites):
     return bosonic_basis_size(nrbosons, nrsites)
 
@@ -180,7 +180,7 @@ cdef inline double contract_states(bstate state1, bstate state2) nogil:
     else:
         return 0.
     #free_bosons(state1) not needed. 
-    #free_bosons(state2)
+    #free_bosons(state2) not needed. will crash. free inside the fx getting called from
 
 
 ##########
@@ -226,6 +226,12 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
                 free(tmp_state3.state)
                 free(tmp_state4.state)
                 free(tmp_state5.state)
+    tmp_state1.state = NULL
+    tmp_state2.state = NULL
+    tmp_state3.state = NULL
+    tmp_state4.state = NULL
+    tmp_state5.state = NULL
+                
                 
 
 

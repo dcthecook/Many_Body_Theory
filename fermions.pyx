@@ -104,7 +104,7 @@ cdef fstate* get_basis(int nr_fermions, int nr_sites):
         basis[i].state = state
         basis[i].size = nr_sites
         basis[i].norm_const = 1.0
-        x = state & -state
+        x = state & -state #quick cheat to avoid div by zero error. will give compiler waring with no error
         y = state + x
         state = ((state & ~y) // x) >> 1 | y
     return basis
@@ -165,9 +165,9 @@ cdef double contract_fstates(fstate in_state1, fstate in_state2) nogil:
 ##################################################
 ##################################################
 
-cdef double[:,:] get_paulix_j(int j, int N):
-    cdef double[:,:] paulix = np.array([[0,1],[1,0]], dtype=np.double)
-    cdef double[:,:] result
+cdef double[:,::1] get_paulix_j(int j, int N):
+    cdef double[:,::1] paulix = np.array([[0,1],[1,0]], dtype=np.double)
+    cdef double[:,::1] result
     if (j == 1):
         result = np.kron(paulix, np.identity(2**(N-1), dtype=np.double))
     elif (j!=1 and j!=N):
@@ -178,9 +178,9 @@ cdef double[:,:] get_paulix_j(int j, int N):
     return result
 
 
-cdef double complex[:,:] get_pauliy_j(int j, int N):
-    cdef double complex[:,:] pauliy = np.array([[0.0 + 0.0j, 0.0 - 1.0j], [0.0 + 1.0j, 0.0 + 0.0j]], dtype=np.cdouble)
-    cdef double complex[:,:] result
+cdef double complex[:,::1] get_pauliy_j(int j, int N):
+    cdef double complex[:,::1] pauliy = np.array([[0.0 + 0.0j, 0.0 - 1.0j], [0.0 + 1.0j, 0.0 + 0.0j]], dtype=np.cdouble)
+    cdef double complex[:,::1] result
     if (j == 1):
         result = np.kron(pauliy, np.identity(2**(N-1), dtype=np.cdouble))
     elif (j != 1 and j != N):
@@ -192,9 +192,9 @@ cdef double complex[:,:] get_pauliy_j(int j, int N):
 
 
 
-cdef double[:,:] get_pauliz_j(int j, int N):
-    cdef double[:,:] pauliz = np.array([[1,0],[0,-1]], dtype=np.double)
-    cdef double[:,:] result
+cdef double[:,::1] get_pauliz_j(int j, int N):
+    cdef double[:,::1] pauliz = np.array([[1,0],[0,-1]], dtype=np.double)
+    cdef double[:,::1] result
     if (j == 1):
         result = np.kron(pauliz, np.identity(2**(N-1), dtype=np.double))
     elif (j!=1 and j!=N):
