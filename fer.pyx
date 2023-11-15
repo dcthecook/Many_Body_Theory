@@ -80,3 +80,4 @@ enter for loop once and both if statements SHOULD? remain the exact same with on
         if in_fstate.state & mask2:
             count = count + 1
 """
+#^_^ test further
