@@ -64,3 +64,19 @@ print(count_ones(test, 2))
 # test.norm_const = whatever
 # test if this actually gives overflow.
 # the correct answer is 2*(16-in_index) ^-^
+
+
+"""
+PROPOSED CHANGES:
+create 2 masks
+cdef int mask1 = 1  #which is 2**0
+cdef int mask2 = <int>2**in_fstate.size  #this guarantees the second mask has a 1 where the half array is
+# so for size = 3 the mask2 is 001000 and mask 1 = 000001
+enter for loop once and both if statements SHOULD? remain the exact same with only changing mask
+    for i in range(in_index-1):
+        mask1 = mask1 << 1
+        if in_fstate.state & mask1:
+            count = count + 1
+        if in_fstate.state & mask2:
+            count = count + 1
+"""
