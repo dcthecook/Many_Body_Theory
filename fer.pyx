@@ -55,3 +55,12 @@ test.size = 4
 test.norm_const = 1
 print(count_ones(test, 2))
 
+
+# could give int overflow in the 2*in_fstate.state line
+# for example a 16 site fermion system with spin can fill the entire 32bit int
+# set for example
+# test.state = 4294967295
+# test.size = 16
+# test.norm_const = whatever
+# test if this actually gives overflow.
+# the correct answer is 2*(16-in_index)
