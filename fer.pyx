@@ -36,18 +36,17 @@ cpdef void print_fstate(fstate in_state):
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef int count_ones(fstate in_fstate, int in_index) nogil:
-    cdef unsigned int up_count = 0
-    cdef unsigned int down_count = 0
+    cdef unsigned int count = 0
     cdef unsigned int mask = 1
     # Adjust the mask to consider the last site relevant digits
     mask = mask << (in_fstate.size - in_index)
     for i in range(in_index-1):
         mask = mask << 1
         if in_fstate.state & mask:
-            up_count = up_count + 1
+            count = count + 1
         if (2*in_fstate.state<<in_fstate.state) & mask:
-                down_count = down_count + 1
-    return down_count + up_count
+            count = count + 1
+    return count
 
 #test
 cdef fstate test
@@ -56,3 +55,12 @@ test.size = 4
 test.norm_const = 1
 print(count_ones(test, 2))
 
+
+# could give int overflow in the 2*in_fstate.state line
+# for example a 16 site fermion system with spin can fill the entire 32bit int
+# set for example
+# test.state = 4294967295
+# test.size = 16
+# test.norm_const = whatever
+# test if this actually gives overflow.
+# the correct answer is 2*(16-in_index) ^-^
