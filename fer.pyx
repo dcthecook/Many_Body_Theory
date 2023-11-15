@@ -63,4 +63,4 @@ print(count_ones(test, 2))
 # test.size = 16
 # test.norm_const = whatever
 # test if this actually gives overflow.
-# the correct answer is 2*(16-in_index)
+# the correct answer is 2*(16-in_index) ^-^
