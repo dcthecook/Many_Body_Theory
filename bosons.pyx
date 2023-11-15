@@ -219,7 +219,7 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
                 t*contract_states(basis[i], tmp_state1) +\
                 t*contract_states(basis[i], tmp_state2) +\
                 U*0.5*contract_states(basis[i], tmp_state3) +\
-                U*0.5*contract_states(basis[i], tmp_state4) -\
+                U*0.5*contract_states(basis[i], tmp_state4) +\
                 nu*contract_states(basis[i], tmp_state5)
                 free(tmp_state1.state)
                 free(tmp_state2.state)
@@ -238,13 +238,13 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cpdef double[:,::1] Bose_Hubbard(int bosons, int sites, double t, double U, double nu):
-    cdef int h_size = <int>bosonic_basis_size(bosons, sites)
+    cdef int h_size = bosonic_basis_size(bosons, sites)
     cdef bstate* basis = ordered_basis(bosons, sites)
     cdef double[:,::1] hamiltonian = np.zeros((h_size, h_size), dtype=np.double)
     interacting_boson_gas(bosons, sites, t, U, nu, basis, hamiltonian, h_size)
     cdef size_t i
     for i in range(h_size):
-        free_bosons(basis[i])
+        free_bosons(basis[i]) #remember the free_bosons accounts for setting the pointer of the bstate struct to NULL too
     free(basis)
     basis = NULL
     return hamiltonian
