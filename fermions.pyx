@@ -210,7 +210,7 @@ cdef double[:,::1] get_pauliz_j(int j, int N):
 
 ##########
 ##########
-# The main getter method for the hamiltonian and its CPython call function for future imports
+# The main calculation method for the hamiltonian and its CPython call function for future imports
 # fermi_hamiltonian simply takes a matrix as input and iterates through the elements
 # It then changes them according to which basis states are contracted with the Hamiltonian operator
 # The summation over the Hopping term and Potential term are added for each element.
