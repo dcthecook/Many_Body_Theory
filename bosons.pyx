@@ -19,7 +19,7 @@ from libc.stdlib cimport malloc, free
 from libc.math cimport sqrt
 from cython cimport sizeof
 from itertools import combinations_with_replacement
-import matplotlib.pyplot as plt
+
 
 import numpy as np
 cimport numpy as np
@@ -35,22 +35,7 @@ cdef void free_bosons(bstate in_state) nogil:
     free(in_state.state)
     in_state.state = NULL
 
-  
-## DO NOT CALL ! Gives int overflow for large numbers
-## Use function below
-@cython.boundscheck(False)
-@cython.wraparound(False)
-cdef int factorial(int a, int start) nogil:
-    if a == 0:
-        return 1
-    if start <= a:
-        pass
-    cdef int result, i
-    result = 1
-    for i in range(start-1, a):
-        result = result*(i+1)
-    return result
-    
+
 
 # Recursive function for Combinations with replacements formula.
 # Avoids int overflow in the division the old formula suffers from 
