@@ -81,3 +81,41 @@ enter for loop once and both if statements SHOULD? remain the exact same with on
             count = count + 1
 """
 #^_^ test further
+
+
+"""
+After finishing testing the count_ones() fx above have to move to the operators
+First the has_occupation_spin() fx has to be created which is the counterpart of has_occupation(fstate in_state, int site)
+It will be passed another argument (char spin) which will be either 0 or 1 from the user
+If 0 the function will check if down-spin electrons exist at the given index
+This means the fx has to take into account the left half of the in_state.state with regards to in_state.size
+If 1 the function will check the right half if it is occupied at that index
+!!Care for index algebra
+
+The 3 basic operators in the spinless code are
+apply_fannahilator_nospin(fstate in_state, int site)
+apply_fcreator_nospin(fstate in_state, int site)
+number_operator(fstate in_state, int site)
+
+these need duplicates for the spin system counterpart
+
+apply_fannahilator_spin(fstate in_state, int site, char spin)
+apply_fcreator_spin(fstate in_state, int site, char spin)
+number_operator_spin(fstate in_state, int site, char spin)
+
+where char is an 8-bit mem block
+ideally we can use int and represent the spin as 0 or 1 but because these fx
+will be called millions of times you can save 8x more registry memory with temp variables
+another way, because these are meant to be read and not modified
+is to make the input a char* pointer. Passing by reference instead of by value is much faster
+
+so you create globals
+cdef char down_representation = 0
+cdef char up_representation = 1
+cdef char* down = &down_representation
+cdef char* up = &up_representation
+
+and then you can for example do has_occupation(fstate=test_state, index=6, spin=down)
+this may need more troubleshooting
+
+"""

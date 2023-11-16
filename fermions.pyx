@@ -169,12 +169,12 @@ cdef double[:,::1] get_paulix_j(int j, int N):
     cdef double[:,::1] paulix = np.array([[0,1],[1,0]], dtype=np.double)
     cdef double[:,::1] result
     if (j == 1):
-        result = np.kron(paulix, np.identity(2**(N-1), dtype=np.double))
+        result = np.kron(paulix, np.identity(<int>2**(N-1), dtype=np.double))
     elif (j!=1 and j!=N):
-        result = np.kron(np.identity(2**(j-1), dtype=np.int64), paulix)
-        result = np.kron(result, np.identity(2**(N-j), dtype=np.double))
+        result = np.kron(np.identity(<int>2**(j-1), dtype=np.int64), paulix)
+        result = np.kron(result, np.identity(<int>2**(N-j), dtype=np.double))
     else:
-        result = np.kron(np.identity(2**(N-1), dtype=np.int64), paulix)
+        result = np.kron(np.identity(<int>2**(N-1), dtype=np.int64), paulix)
     return result
 
 
@@ -182,12 +182,12 @@ cdef double complex[:,::1] get_pauliy_j(int j, int N):
     cdef double complex[:,::1] pauliy = np.array([[0.0 + 0.0j, 0.0 - 1.0j], [0.0 + 1.0j, 0.0 + 0.0j]], dtype=np.cdouble)
     cdef double complex[:,::1] result
     if (j == 1):
-        result = np.kron(pauliy, np.identity(2**(N-1), dtype=np.cdouble))
+        result = np.kron(pauliy, np.identity(<int>2**(N-1), dtype=np.cdouble))
     elif (j != 1 and j != N):
-        result = np.kron(np.identity(2**(j-1), dtype=np.int64), pauliy)
-        result = np.kron(result, np.identity(2**(N-j), dtype=np.cdouble))
+        result = np.kron(np.identity(<int>2**(j-1), dtype=np.int64), pauliy)
+        result = np.kron(result, np.identity(<int>2**(N-j), dtype=np.cdouble))
     else:
-        result = np.kron(np.identity(2**(N-1), dtype=np.int64), pauliy)
+        result = np.kron(np.identity(<int>2**(N-1), dtype=np.int64), pauliy)
     return result
 
 
@@ -196,12 +196,12 @@ cdef double[:,::1] get_pauliz_j(int j, int N):
     cdef double[:,::1] pauliz = np.array([[1,0],[0,-1]], dtype=np.double)
     cdef double[:,::1] result
     if (j == 1):
-        result = np.kron(pauliz, np.identity(2**(N-1), dtype=np.double))
+        result = np.kron(pauliz, np.identity(<int>2**(N-1), dtype=np.double))
     elif (j!=1 and j!=N):
-        result = np.kron(np.identity(2**(j-1), dtype=np.double), pauliz)
-        result = np.kron(result, np.identity(2**(N-j), dtype=np.double))
+        result = np.kron(np.identity(<int>2**(j-1), dtype=np.double), pauliz)
+        result = np.kron(result, np.identity(<int>2**(N-j), dtype=np.double))
     else:
-        result = np.kron(np.identity(2**(N-1), dtype=np.int64), pauliz)
+        result = np.kron(np.identity(<int>2**(N-1), dtype=np.int64), pauliz)
     return result
 
 
