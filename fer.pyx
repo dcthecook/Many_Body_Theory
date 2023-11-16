@@ -71,10 +71,6 @@ cdef inline int has_occupation(fstate in_fstate, int site, int spin) nogil:
     else:
         return in_fstate.state >> (2*in_fstate.size - site) & 1
 
-#test
-print(has_occupation(test, 16, "bob"))
-
-
 
 """
 The 3 basic operators in the spinless code are
