@@ -35,63 +35,44 @@ cpdef void print_fstate(fstate in_state):
 # Brian Kernighan's Algorithm
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int count_ones(fstate in_fstate, int in_index) nogil:
+cdef int count_ones_spin(fstate in_fstate, int in_index) nogil:
     cdef unsigned int count = 0
-    cdef unsigned int mask = 1
-    # Adjust the mask to consider the last site relevant digits
-    mask = mask << (in_fstate.size - in_index)
+    cdef unsigned int mask1 = 1
+    cdef unsigned int mask2 = <int>2**in_fstate.size
+    # Adjust the mask1 to consider the last site relevant digits
+    mask1 = mask1 << (in_fstate.size - in_index)
+    mask2 = mask2 << (in_fstate.size - in_index)
     for i in range(in_index-1):
-        mask = mask << 1
-        if in_fstate.state & mask:
+        mask1 = mask1 << 1
+        mask2 = mask2 << 1
+        if in_fstate.state & mask1:
             count = count + 1
-        if (2*in_fstate.state<<in_fstate.state) & mask:
+        if in_fstate.state & mask2:
             count = count + 1
     return count
 
 #test
 cdef fstate test
-test.state = 33
-test.size = 4
+test.state = 4294967295
+test.size = 16
 test.norm_const = 1
-print(count_ones(test, 2))
+print("expected value: 30. output:", count_ones_spin(test, 16))
 
+##########
+##########
+# The functions checks if @in_fstate has an up or down @spin at a @site
+# @site is a number that starts from 1 and counts from the left
+##########
+##########
 
-# could give int overflow in the 2*in_fstate.state line
-# for example a 16 site fermion system with spin can fill the entire 32bit int
-# set for example
-# test.state = 4294967295
-# test.size = 16
-# test.norm_const = whatever
-# test if this actually gives overflow.
-# the correct answer is 2*(16-in_index) ^-^
-
-
-"""
-PROPOSED CHANGES:
-create 2 masks
-cdef int mask1 = 1  #which is 2**0
-cdef int mask2 = <int>2**in_fstate.size  #this guarantees the second mask has a 1 where the half array is
-# so for size = 3 the mask2 is 001000 and mask 1 = 000001
-enter for loop once and both if statements SHOULD? remain the exact same with only changing mask
-    for i in range(in_index-1):
-        mask1 = mask1 << 1
-        if in_fstate.state & mask1:
-            count = count + 1
-        if in_fstate.state & mask2:
-            count = count + 1
-"""
-#^_^ test further
+cdef inline int has_occupation(fstate in_fstate, int site, int spin) nogil:
+    if spin:
+        return in_fstate.state >> (in_fstate.size - site) & 1
+    else:
+        return in_fstate.state >> (2*in_fstate.size - site) & 1
 
 
 """
-After finishing testing the count_ones() fx above have to move to the operators
-First the has_occupation_spin() fx has to be created which is the counterpart of has_occupation(fstate in_state, int site)
-It will be passed another argument (char spin) which will be either 0 or 1 from the user
-If 0 the function will check if down-spin electrons exist at the given index
-This means the fx has to take into account the left half of the in_state.state with regards to in_state.size
-If 1 the function will check the right half if it is occupied at that index
-!!Care for index algebra
-
 The 3 basic operators in the spinless code are
 apply_fannahilator_nospin(fstate in_state, int site)
 apply_fcreator_nospin(fstate in_state, int site)
