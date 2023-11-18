@@ -1,8 +1,5 @@
-##########
-##########
 # Imports
-##########
-##########
+
 cimport cython
 from libc.stdlib cimport malloc, free
 from cython cimport sizeof
@@ -12,18 +9,17 @@ cimport numpy as np
 from math import comb
 
 
-##########
-##########
-# The main struct for a state. with a function to print one.
-# The struct holds an int with a binary representation, the physical size of the state
-# and the normalization constant relevant for operators
-# e.g. cdef fstate test
-# e.g test.state = 10
+# The main struct for a femion state (with a function to print one)
+# @state: int in a binary representation, 
+# @size: the physical size of the state
+# @norm_const: normalization constant (relevant for operators)
+# e.g. 
+# cdef fstate test
+# test.state = 10
 # test.size = 1
 # test.norm_const = 1
 # print_fstate(test)
-##########
-##########
+
 ctypedef struct fstate:
     unsigned int state
     unsigned int size
@@ -31,8 +27,9 @@ ctypedef struct fstate:
     
 cpdef void print_fstate(fstate in_state):
     print(format(in_state.state, '0'+str(in_state.size)+'b'),"\n")
-    
-# Brian Kernighan's Algorithm
+
+
+# Brian Kernighan's Algorithm (counting ones in a fstate)
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef int count_ones_spin(fstate in_fstate, int in_index) nogil:
@@ -51,19 +48,10 @@ cdef int count_ones_spin(fstate in_fstate, int in_index) nogil:
             count = count + 1
     return count
 
-#test
-cdef fstate test
-test.state = 4294967295
-test.size = 16
-test.norm_const = 1
-print("expected value: 30. output:", count_ones_spin(test, 16))
 
-##########
-##########
-# The functions checks if @in_fstate has an up or down @spin at a @site
+# has_occupation functions checks if @in_fstate has an up or down @spin at a @site
 # @site is a number that starts from 1 and counts from the left
-##########
-##########
+# returns 0 r 1
 
 cdef inline int has_occupation(fstate in_fstate, int site, int spin) nogil:
     if spin:
@@ -71,6 +59,66 @@ cdef inline int has_occupation(fstate in_fstate, int site, int spin) nogil:
     else:
         return in_fstate.state >> (2*in_fstate.size - site) & 1
 
+    
+# flip_spin method returns a state with a flipped @spin at @flip_site
+
+cdef fstate flip_spin(fstate in_fstate, int flip_site, int spin) nogil:
+    cdef fstate result = in_fstate
+    if spin: 
+        result.state = in_fstate.state ^ ( 1 << (in_fstate.size - flip_site))
+    else:
+        result.state = in_fstate.state ^ ( 1 << (2*in_fstate.size - flip_site))
+    return result
+
+
+# annahilation operator
+# returns a state and changes the norm of @result
+
+cdef fstate apply_fannahilator_spin(fstate in_fstate, int site, int spin) nogil:
+    cdef fstate result = in_fstate
+    if has_occupation_spin(in_fstate, site, spin):
+        result = flip_spin(in_fstate, site, spin)
+        result.norm_const = in_fstate.norm_const * ((-1)**(count_ones_spin(in_fstate, site)))
+    else:
+        result.norm_const = result.norm_const*0
+    return result
+
+
+#tests
+#count_ones_spin test
+cdef fstate test
+test.state = 4294967295
+test.size = 16
+test.norm_const = 1
+print("expected value: 30. output:", count_ones_spin(test, 16))
+
+# flip_spin test, spin down
+cdef fstate test1
+test1.state = 172
+test1.size = 4
+test1.norm_const = 1
+print("expected state value: 44. output:", flip_spin(test1, 3, 0))
+
+# flip_spin test, spin up
+print("expected state value: 164. output:", flip_spin(test1, 1, 1))
+
+#apply_fannahilator_spin test
+cdef fstate test2
+test2.state = 172
+test2.size = 4
+test2.norm_const = 1
+
+#test spin down, occupation 0
+print("expected value: 172. output:", apply_fannahilator_spin(test2, 2, 0))
+
+#test spin up, occupation 0,
+print("expected value: 172. output:", apply_fannahilator_spin(test2, 3, 1))
+
+#test spin down, occupation 1
+print("expected value: 140. output:", apply_fannahilator_spin(test2, 3, 0))
+
+#test spin up, occupation 1
+print("expected value: 164. output:", apply_fannahilator_spin(test2, 1, 1))
 
 """
 The 3 basic operators in the spinless code are
