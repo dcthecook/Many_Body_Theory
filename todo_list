@@ -1,0 +1,16 @@
+System successfully incorporated:
+- Bose Hubbard
+- Fermi Hubbard
+- Full Heisenberg model (incl. xyz's, ising etc)
+
+
+TO DO:
+- Wigner Transformed Ising Model in the fermions basis !! care does not conserve total nr of fermions. check literature
+- Anderson/Anderson Impurity Model
+- t-J model
+
+Classical spin lattice sim:
+- Pott's Model
+- Ising (metropolis)
+- General Percolation
+- XY model
