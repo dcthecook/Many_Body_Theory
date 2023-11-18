@@ -104,6 +104,14 @@ cdef fstate apply_fcreator_spin(fstate in_fstate, int site, int spin) nogil:
 
 # number operator 
 
+cdef fstate apply_numberOp_spin(fstate in_fstate, int site, int spin) nogil:
+    cdef fstate result = in_fstate
+    if has_occupation_spin(in_fstate, site, spin):
+        result.norm_const = result.norm_const*1.
+    else:
+        result.norm_const = result.norm_const*0.
+    return result
+
 
 # tests
 cdef fstate test
@@ -153,3 +161,17 @@ print("expected value: 172. output:", apply_fcreator_spin(test1, 3, 0))
 
 # test spin up, occupation 1
 print("expected value: 172. output:", apply_fcreator_spin(test1, 1, 1))
+
+
+print("apply_numberOp_spin tests:")
+# test spin down, occupation 0
+print("expected value: 0. output:", apply_numberOp_spin(test1, 2, 0))
+
+# test spin up, occupation 0,
+print("expected value: 0. output:", apply_numberOp_spin(test1, 3, 1))
+
+# test spin down, occupation 1
+print("expected value: 1. output:", apply_numberOp_spin(test1, 3, 0))
+
+# test spin up, occupation 1
+print("expected value: 1. output:", apply_numberOp_spin(test1, 1, 1)
