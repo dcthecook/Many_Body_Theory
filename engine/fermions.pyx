@@ -9,6 +9,8 @@ regarding fermionic systems in second quantization form. Currently present are
 3 functions for 3 specific Hamiltonians. The general Fermi-Hubbard model, the general
 Heisenberg model and the XXX model with an interaction in the z axis 
 potential.
+
+19 NOV: added the spin Fermi Hubbard
 """
 ##################################################
 ##################################################
