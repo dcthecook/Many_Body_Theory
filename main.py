@@ -44,9 +44,11 @@ def create_output_prompt(main_window):
     output_prompt = QTextEdit()
     output_prompt.setReadOnly(True)
     output_prompt.append(starting_text)  # Initial welcome message
+    output_prompt.setStyleSheet("color: white; background-color: black;")
 
     output_prompt_panel.setWidget(output_prompt)
-    #output_prompt_panel.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
+    output_prompt_panel.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
+    output_prompt_panel.setMinimumWidth(300)  # Set the initial width to 300 pixels
     main_window.addDockWidget(2, output_prompt_panel)  # Add dock widget to the main window, 4 represents bottom dock area
 
 # Function to create the central OpenGL widget

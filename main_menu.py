@@ -77,16 +77,23 @@ def create_simulation_menu(main_window):
 
 def create_projects_menu(main_window):
     projects_menu = main_window.menuBar().addMenu('Projects')
-
     # Add actions to the Projects menu...
-    # ...
+    open_project = QAction('Open Porject', main_window)
+    projects_menu.addAction(open_project)
+    #
+    create_new_project = QAction('Create new Porject', main_window)
+    projects_menu.addAction(create_new_project)
 
 
 def create_console_menu(main_window):
     console_menu = main_window.menuBar().addMenu('Console')
-
     # Add actions to the Console menu...
-    # ...
+    output_only = QAction('Output mode only', main_window)
+    console_menu.addAction(output_only)
+    #
+    input_output = QAction('I/O mode (Advanced users)', main_window)
+    console_menu.addAction(input_output)
+
 
 
 def create_tools_menu(main_window):
