@@ -6,108 +6,15 @@ Created on Thu Oct 19 18:50:23 2023
 """
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QMenu, \
-    QTreeView, QFileSystemModel, QVBoxLayout, QWidget, QDockWidget
+    QTreeView, QFileSystemModel, QVBoxLayout, QWidget, QDockWidget, QTextEdit, QOpenGLWidget
 from PyQt5.QtGui import QIcon  # Import QIcon from QtGui module
-
-
-def create_file_menu(main_window):
-    file_menu = main_window.menuBar().addMenu('File')
-    #
-    open_action = QAction('Open', main_window)
-    file_menu.addAction(open_action)
-    #
-    save_action = QAction('Save', main_window)
-    file_menu.addAction(save_action)
-    #
-    save_as_action = QAction('Save As', main_window)
-    file_menu.addAction(save_as_action)
-    #
-    export_action = QAction('Export', main_window)
-    file_menu.addAction(export_action)
-    #
-    import_action = QAction('Import', main_window)
-    file_menu.addAction(import_action)
-    
-    
-    
-def create_model_menu(main_window):
-    model_menu = main_window.menuBar().addMenu('Model')
-    
-    onedim_menu = QMenu('1D Linear Chains', main_window)
-    model_menu.addMenu(onedim_menu)
-    # Add actions to the Model menu...
-    Fermi_Hubbard_nospin = QAction('Fermi-Hubbard Spinless', main_window)
-    onedim_menu.addAction(Fermi_Hubbard_nospin)
-    Fermi_Hubbard_spin = QAction('Fermi-Hubbard with Spin', main_window)
-    onedim_menu.addAction(Fermi_Hubbard_spin)
-    Bose_Hubbard = QAction('Bose-Hubbard', main_window)
-    onedim_menu.addAction(Bose_Hubbard)
-    Heisenberg = QAction('Full Heisenberg model', main_window)
-    onedim_menu.addAction(Heisenberg)
-    XXX = QAction('XXX model with Z interaction', main_window)
-    onedim_menu.addAction(XXX)
-    AndersonImp = QAction('Single-Impurity Anderson', main_window)
-    onedim_menu.addAction(AndersonImp)
-    tJ = QAction('t-J model', main_window)
-    onedim_menu.addAction(tJ)
-    #Molecular stuff
-    HF_menu = QMenu('Hartree-Fock', main_window)
-    model_menu.addMenu(HF_menu)
-    #Add actions
-    #. . . 
-    DFT_menu = QMenu('Density Functional Theory', main_window)
-    model_menu.addMenu(DFT_menu)
-
-def create_edit_menu(main_window):
-    edit_menu = main_window.menuBar().addMenu('Edit')
-
-    # Add actions to the Edit menu...
-    # ...
-
-def create_search_menu(main_window):
-    search_menu = main_window.menuBar().addMenu('Search')
-
-    # Add actions to the Search menu...
-    # ...
-
-def create_simulation_menu(main_window):
-    simulation_menu = main_window.menuBar().addMenu('Simulation')
-
-    # Add actions to the Simulation menu...
-    # ...
-
-def create_projects_menu(main_window):
-    projects_menu = main_window.menuBar().addMenu('Projects')
-
-    # Add actions to the Projects menu...
-    # ...
-
-def create_console_menu(main_window):
-    console_menu = main_window.menuBar().addMenu('Console')
-
-    # Add actions to the Console menu...
-    # ...
-
-def create_tools_menu(main_window):
-    tools_menu = main_window.menuBar().addMenu('Tools')
-
-    # Add actions to the Tools menu...
-    # ...
-
-def create_settings_menu(main_window):
-    settings_menu = main_window.menuBar().addMenu('Settings')
-
-    # Add actions to the Settings menu...
-    # ...
-
-def create_help_menu(main_window):
-    help_menu = main_window.menuBar().addMenu('Help')
-
-    # Add actions to the Help menu...
-    # ...
+import moderngl
+#from PyQt5.QtOpenGL import QOpenGLWidget
+from main_menu import *
 
 
 
+"""
 def create_left_panel(main_window):
     left_panel_dock = QDockWidget("File Explorer", main_window)
     left_panel_widget = QWidget()
@@ -121,12 +28,50 @@ def create_left_panel(main_window):
 
     left_panel_layout.addWidget(file_explorer)
     left_panel_widget.setLayout(left_panel_layout)
-    
+
     left_panel_dock.setWidget(left_panel_widget)
     left_panel_dock.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
     main_window.addDockWidget(1, left_panel_dock)  # Place the dock on the left side
+"""
+
+starting_text = "Welcome! \nQuantum Many-Body Theory Calculator\nCurrent Ver: development 1.0\nAuthor: E.Ç\nCurrent \
+release date: 25 October 2023\n Enjoy !\n.    .    .    .    .    .\n.    .    .    .    .    .\n~~~~~~~~~~\n"
 
 
+def create_output_prompt(main_window):
+    output_prompt_panel = QDockWidget("Output Prompt", main_window)
+
+    output_prompt = QTextEdit()
+    output_prompt.setReadOnly(True)
+    output_prompt.append(starting_text)  # Initial welcome message
+
+    output_prompt_panel.setWidget(output_prompt)
+    #output_prompt_panel.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
+    main_window.addDockWidget(2, output_prompt_panel)  # Add dock widget to the main window, 4 represents bottom dock area
+
+# Function to create the central OpenGL widget
+def create_opengl_widget(main_window):
+    opengl_functions = {
+        'initializeGL': lambda: None,  # Placeholder initialization function
+        'paintGL': lambda: None,  # Placeholder paint function
+        'resizeGL': lambda w, h: None  # Placeholder resize function
+    }
+
+    def initializeGL():
+        opengl_functions['initializeGL']()
+
+    def paintGL():
+        opengl_functions['paintGL']()
+
+    def resizeGL(w, h):
+        opengl_functions['resizeGL'](w, h)
+
+    opengl_widget = QOpenGLWidget()
+    opengl_widget.initializeGL = initializeGL
+    opengl_widget.paintGL = paintGL
+    opengl_widget.resizeGL = resizeGL
+
+    return opengl_widget
 
 def create_window():
     app = QApplication(sys.argv)
@@ -150,13 +95,18 @@ def create_window():
     create_tools_menu(main_window)
     create_settings_menu(main_window)
     create_help_menu(main_window)
-    
-    create_left_panel(main_window)
+
+    #create_left_panel(main_window)
+    create_output_prompt(main_window)
+    opengl_widget = create_opengl_widget(main_window)
+    main_window.setCentralWidget(opengl_widget)
 
     main_window.show()
 
     sys.exit(app.exec_())
 
+
 if __name__ == '__main__':
     create_window()
+
 

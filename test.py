@@ -19,7 +19,7 @@ test_object4 = eb.Bose_Hubbard(5, 6, -1, 0.12, 0.08)
 
 plt.style.use('dark_background')
 plt.figure(figsize=(100, 100))
-font = 55
+font = 50
 # Plot the first object
 plt.subplot(411)  # 1 row, 3 columns, plot 1
 plt.imshow(test_object1, cmap='ocean')
