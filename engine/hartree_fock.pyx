@@ -30,7 +30,7 @@ cdef struct Molecule:
     int nr_atoms
     
     
-cdef primitive_gaussian create_gauss(double inalpha, double incoeff, double[3] incoords):
+cdef primitive_gaussian create_gauss(double inalpha, double incoeff, double[3] incoords) nogil:
     cdef primitive_gaussian result
     result.alpha = inalpha
     result.coeff = incoeff
@@ -43,8 +43,9 @@ cdef primitive_gaussian create_gauss(double inalpha, double incoeff, double[3] i
     result.l3 = 0
     return result
 
-
-cdef Atom create_atom(double[::1] alphas, double[::1] coeffs, double[3] coords, int nr_gaussians):
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef Atom create_atom(double[::1] alphas, double[::1] coeffs, double[3] coords, int nr_gaussians) nogil:
     cdef Atom result_atom
     result_atom.functions = <primitive_gaussian*>malloc(nr_gaussians*sizeof(primitive_gaussian))
     result_atom.nr_functions = nr_gaussians
@@ -54,8 +55,9 @@ cdef Atom create_atom(double[::1] alphas, double[::1] coeffs, double[3] coords, 
     return result_atom
 
 
-
-cdef Molecule create_molecule(Atom* atom_list, int total_atoms):
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef Molecule create_molecule(Atom* atom_list, int total_atoms) nogil:
     cdef Molecule result_molec
     result_molec.atoms = <Atom*>malloc(total_atoms*sizeof(Atom))
     result_molec.nr_atoms = total_atoms
@@ -64,11 +66,11 @@ cdef Molecule create_molecule(Atom* atom_list, int total_atoms):
         result_molec.atoms[i] = atom_list[i]
     return result_molec
 
-cdef void free_Atom(Atom inatom):
+cdef void free_Atom(Atom inatom) nogil:
     free(inatom.functions)
     inatom.functions = NULL
     
-cdef void free_Molecule(Molecule inmolec):
+cdef void free_Molecule(Molecule inmolec) nogil:
     cdef int i
     for i in range(i):
         free_Atom(inmolec.atoms[i])
@@ -80,18 +82,20 @@ cdef void print_molecule(Molecule in_molec):
     print(f"nr of atoms:{in_molec.nr_atoms}\n")
     for i in range(in_molec.nr_atoms):
         print("\n",i+1 ," Atom:\n~~~\n")
+        print("\ncoords:[", in_molec.atoms[i].functions[j].coordinates[0],",",\
+              in_molec.atoms[i].functions[j].coordinates[1],",",\
+                in_molec.atoms[i].functions[j].coordinates[2],"]\n")
         for j in range(in_molec.atoms[i].nr_functions):
             print("\n####gauss-fx:", j+1,"\n####")
             print("\nalpha:", in_molec.atoms[i].functions[j].alpha)
             print("\ncoefficient:", in_molec.atoms[i].functions[j].coeff)
-            print("\ncoords:[", in_molec.atoms[i].functions[j].coordinates[0],",",\
-                  in_molec.atoms[i].functions[j].coordinates[1],",",\
-                    in_molec.atoms[i].functions[j].coordinates[2],"]")
+            
             print("\nnorm_const=",in_molec.atoms[i].functions[j].A)
             #print l1 l2 l3 statemtns
             
 
 
+    
 
 ##
 # Hydrogen STO-3G basis
@@ -100,7 +104,7 @@ cdef void print_molecule(Molecule in_molec):
 #      0.6239137298E+00       0.5353281423E+00
 #      0.1688554040E+00       0.4446345422E+00
 ##
-#create hydrogen
+#create hydrogen test unit for structs
 
 cdef double[3] Hcoords1 = [0,0,0]
 cdef double[3] Hcoords2 = [0,0,1.4]
