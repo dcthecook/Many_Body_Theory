@@ -10,32 +10,15 @@ from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QMenu, \
 from PyQt5.QtGui import QIcon  # Import QIcon from QtGui module
 import moderngl
 #from PyQt5.QtOpenGL import QOpenGLWidget
-from main_menu import *
+from gui_elements.main_menu import *
 
 
 
-"""
-def create_left_panel(main_window):
-    left_panel_dock = QDockWidget("File Explorer", main_window)
-    left_panel_widget = QWidget()
-    left_panel_layout = QVBoxLayout(left_panel_widget)
 
-    file_explorer = QTreeView()
-    model = QFileSystemModel()
-    model.setRootPath("")  # Set the root path as needed
-    file_explorer.setModel(model)
-    file_explorer.setRootIndex(model.index(""))  # Set the root index
 
-    left_panel_layout.addWidget(file_explorer)
-    left_panel_widget.setLayout(left_panel_layout)
-
-    left_panel_dock.setWidget(left_panel_widget)
-    left_panel_dock.setFeatures(QDockWidget.DockWidgetMovable | QDockWidget.DockWidgetFloatable)
-    main_window.addDockWidget(1, left_panel_dock)  # Place the dock on the left side
-"""
-
-starting_text = "Welcome! \nQuantum Many-Body Theory Calculator\nCurrent Ver: development 1.0\nAuthor: E.Ç\nCurrent \
-release date: 25 October 2023\n Enjoy !\n.    .    .    .    .    .\n.    .    .    .    .    .\n~~~~~~~~~~\n"
+starting_text = "Welcome! \nQuantum Many-Body Theory Calculator\
+\nCurrent Ver: development 1.0\nAuthor: E.Ç\nCurrent \
+release date: 25 October 2023\nEnjoy bois :0 !\n.   .   .   .   .   .\n.   .   .   .   .   .\n~~~~~~~~~~\n"
 
 
 def create_output_prompt(main_window):
