@@ -426,14 +426,3 @@ cpdef double[:,::1] XXX_Z(double Jx, double hz, int N):
     return result
 
 
-#cdef int fermions_nr = 5
-#cdef int sites_nr = 5
-#cdef str spin_stat = 'spin'
-
-#import matplotlib.pyplot as plt
-#test_object = Fermi_Hubbard(fermions_nr, sites_nr, 1, -0.58, 0.01, spin_stat)
-#plt.style.use('dark_background')
-#plt.figure(figsize=(30, 30))
-#plt.imshow(test_object, cmap='ocean')
-#plt.title(spin_stat+' fermi hubbard with fermions = '+str(fermions_nr)+' and sites = '+str(sites_nr))
-
