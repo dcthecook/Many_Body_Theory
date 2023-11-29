@@ -217,7 +217,6 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
     tmp_state4.state = NULL
     tmp_state5.state = NULL
                 
-                
 
 
 @cython.boundscheck(False)

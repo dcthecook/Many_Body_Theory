@@ -78,7 +78,8 @@ cdef void free_Molecule(Molecule inmolec) nogil:
     inmolec.atoms = NULL
 
 cdef void print_molecule(Molecule in_molec):
-    cdef int i, j
+    cdef int i = 0
+    cdef int j = 0
     print(f"nr of atoms:{in_molec.nr_atoms}\n")
     for i in range(in_molec.nr_atoms):
         print("\n",i+1 ," Atom:\n~~~\n")

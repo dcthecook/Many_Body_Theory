@@ -85,7 +85,7 @@ cdef inline int has_occupation_spin(fstate in_fstate, int site, int spin) nogil:
 # Brian Kernighan's Algorithm
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int count_ones_nospin(fstate in_state, int in_index) nogil:
+cdef unsigned int count_ones_nospin(fstate in_state, int in_index) nogil:
     cdef unsigned int count = 0
     cdef unsigned int mask = 1
     # Adjust the mask to consider the last site relevant digits
@@ -117,7 +117,7 @@ cdef fstate flip_nospin(fstate in_state, int flip_site) nogil:
 # Brian Kernighan's Algorithm (counting ones in a fstate)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int count_ones_spin(fstate in_state, int in_index) nogil:
+cdef unsigned int count_ones_spin(fstate in_state, int in_index) nogil:
     cdef unsigned int count = 0
     cdef unsigned int mask1 = 1
     cdef unsigned int mask2 = <int>2**in_state.size
