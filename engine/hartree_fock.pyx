@@ -78,7 +78,8 @@ cdef void free_Molecule(Molecule inmolec) nogil:
     inmolec.atoms = NULL
 
 cdef void print_molecule(Molecule in_molec):
-    cdef int i, j
+    cdef int i = 0
+    cdef int j = 0
     print(f"nr of atoms:{in_molec.nr_atoms}\n")
     for i in range(in_molec.nr_atoms):
         print("\n",i+1 ," Atom:\n~~~\n")
@@ -97,13 +98,15 @@ cdef void print_molecule(Molecule in_molec):
 
     
 
-##
+##################################################
+##################################################
 # Hydrogen STO-3G basis
 #      alphas and coeffs
 #      0.3425250914E+01       0.1543289673E+00
 #      0.6239137298E+00       0.5353281423E+00
 #      0.1688554040E+00       0.4446345422E+00
-##
+##################################################
+##################################################
 #create hydrogen test unit for structs
 
 cdef double[3] Hcoords1 = [0,0,0]

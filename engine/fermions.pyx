@@ -85,7 +85,7 @@ cdef inline int has_occupation_spin(fstate in_fstate, int site, int spin) nogil:
 # Brian Kernighan's Algorithm
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int count_ones_nospin(fstate in_state, int in_index) nogil:
+cdef unsigned int count_ones_nospin(fstate in_state, int in_index) nogil:
     cdef unsigned int count = 0
     cdef unsigned int mask = 1
     # Adjust the mask to consider the last site relevant digits
@@ -117,7 +117,7 @@ cdef fstate flip_nospin(fstate in_state, int flip_site) nogil:
 # Brian Kernighan's Algorithm (counting ones in a fstate)
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef int count_ones_spin(fstate in_state, int in_index) nogil:
+cdef unsigned int count_ones_spin(fstate in_state, int in_index) nogil:
     cdef unsigned int count = 0
     cdef unsigned int mask1 = 1
     cdef unsigned int mask2 = <int>2**in_state.size
@@ -425,15 +425,4 @@ cpdef double[:,::1] XXX_Z(double Jx, double hz, int N):
             np.multiply(hz, get_pauliz_j(j+1, N))
     return result
 
-
-#cdef int fermions_nr = 5
-#cdef int sites_nr = 5
-#cdef str spin_stat = 'spin'
-
-#import matplotlib.pyplot as plt
-#test_object = Fermi_Hubbard(fermions_nr, sites_nr, 1, -0.58, 0.01, spin_stat)
-#plt.style.use('dark_background')
-#plt.figure(figsize=(30, 30))
-#plt.imshow(test_object, cmap='ocean')
-#plt.title(spin_stat+' fermi hubbard with fermions = '+str(fermions_nr)+' and sites = '+str(sites_nr))
 

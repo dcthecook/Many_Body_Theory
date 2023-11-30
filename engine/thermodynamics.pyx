@@ -25,3 +25,4 @@ cdef double partition_function(double beta, double[::1] eigenvalues):
 
 cdef double[:,::1] density_matrix(double part_fx, double[::1] eigenvalues, double[:,::1] eigenvectors):
     cdef double result = np.zeros()
+    ## WIP

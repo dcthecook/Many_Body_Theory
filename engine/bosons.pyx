@@ -9,36 +9,42 @@ regarding bosonic systems in second quantization form. Currently present is only
 1 function for 1 specific Hamiltonian. The general Bose-Hubbard under a chemical 
 potential.
 """
-##########
-##########
+##################################################
+##################################################
 # Imports
-##########
-##########
+##################################################
+##################################################
 cimport cython
 from libc.stdlib cimport malloc, free
 from libc.math cimport sqrt
 from cython cimport sizeof
 from itertools import combinations_with_replacement
-
-
 import numpy as np
 cimport numpy as np
 
-##
+##################################################
+##################################################
+#The main structs for the bosonic state.
+#It holds a pointer to an array that represents the multi state Ket
+##################################################
+##################################################
 ctypedef struct bstate:
     int* state
     int size
     double norm_const
 
-##    
+#free bosons from memory
 cdef void free_bosons(bstate in_state) nogil:
     free(in_state.state)
     in_state.state = NULL
 
 
-
+##################################################
+##################################################
 # Recursive function for Combinations with replacements formula.
-# Avoids int overflow in the division the old formula suffers from 
+# Avoids int overflow in the division the old formula suffers from
+##################################################
+##################################################
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef int bosonic_basis_size(int bosons, int sites) nogil:
@@ -57,11 +63,17 @@ cdef int bosonic_basis_size(int bosons, int sites) nogil:
     return result
 
 
-## To Find the basis size of the system
+## To Find the basis size of the system caller python fx
 cpdef int basis_size_python(int nrbosons, int nrsites):
     return bosonic_basis_size(nrbosons, nrsites)
 
-##
+##################################################
+##################################################
+#Generate the bosons basis and order Lexicographically
+#Use combinations with replecement above coded in
+#the bosonic_basis_size to get the total size
+##################################################
+##################################################
 @cython.boundscheck(False)
 @cython.wraparound(False)
 cdef bstate* ordered_basis(int bosons, int sites):
@@ -92,7 +104,12 @@ cdef bstate* ordered_basis(int bosons, int sites):
 
 
 
-
+##################################################
+##################################################
+#The creator/annahilator operators
+#along wit the number operator
+##################################################
+##################################################
 ##
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -143,6 +160,15 @@ cdef inline bstate number_operator(bstate in_state, int site, int power) nogil:
     nresult.norm_const = <double>(nresult.state[site-1]**power)
     return nresult
 
+
+##################################################
+##################################################
+#Functions to compare the states for Orthonormality
+#And a contract function that does the inner product
+#based on the orthonormality assumption between basis
+#states
+##################################################
+##################################################
 ##
 @cython.boundscheck(False)
 @cython.wraparound(False)
@@ -168,8 +194,8 @@ cdef inline double contract_states(bstate state1, bstate state2) nogil:
     #free_bosons(state2) not needed. will crash. free inside the fx getting called from
 
 
-##########
-##########
+##################################################
+##################################################
 # The main calculating method for the hamiltonian and its CPython call function for future imports
 # interacting_boson_gas simply takes a matrix as input and iterates through the elements
 # It then changes them according to which basis states are contracted with the Hamiltonian operator
@@ -177,8 +203,8 @@ cdef inline double contract_states(bstate state1, bstate state2) nogil:
 
 # The Bose_Hubbard() creates the MeMview and starts a np array. It then runs the function above to edit it
 # The basis pointer is then freed and set to NULL
-##########
-##########
+##################################################
+##################################################
     
 ##
 @cython.boundscheck(False)
@@ -216,7 +242,6 @@ cdef inline void interacting_boson_gas(int bosons, int sites, double t, double U
     tmp_state3.state = NULL
     tmp_state4.state = NULL
     tmp_state5.state = NULL
-                
                 
 
 
