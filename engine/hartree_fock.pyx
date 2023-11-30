@@ -107,8 +107,11 @@ cdef double dot3(double[3] vec1, double[3] vec2):
     result = result + vec1[2]*vec2[2]
     return result
 
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
 cdef double[:,::1] overlap(Molecule molecule):
-    
     cdef int i, j, k, l
     cdef int nbasis = molecule.nr_atoms
     cdef double[:,::1] S = np.zeros([nbasis, nbasis])
