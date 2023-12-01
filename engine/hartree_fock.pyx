@@ -93,60 +93,90 @@ cdef void print_molecule(Molecule in_molec):
                 #accessing forbidden memory of the j index
 
 
-cdef double* sub3(double[3] vec1, double[3] vec2):
+cdef double* sub3(double[3] vec1, double[3] vec2) nogil:
     cdef double[3] result
     result[0] = vec1[0]-vec2[0]
     result[1] = vec1[1]-vec2[1]
     result[2] = vec1[2]-vec2[2]
     return result
 
-cdef double dot3(double[3] vec1, double[3] vec2):
+cdef double dot3(double[3] vec1, double[3] vec2) nogil:
     cdef double result = 0
     result = result + vec1[0]*vec2[0]
     result = result + vec1[1]*vec2[1]
     result = result + vec1[2]*vec2[2]
     return result
 
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef double** zeros(int rows, int cols) nogil: 
+    cdef size_t i, j, k
+    cdef double** result = <double**>malloc(rows*sizeof(double*))
+    for i in range(rows):
+        result[i] = <double*>malloc(cols*sizeof(double))
+    for j in range(rows):
+        for k in range(cols):
+            result[j][k] = 0.    
+    return result 
 
 
 @cython.boundscheck(False)
 @cython.wraparound(False)
-cdef double[:,::1] overlap(Molecule molecule):
+cdef void free_2D(double** arr, int rows) nogil: 
+    cdef size_t i
+    for i in range(rows):
+        free(arr[i])
+        arr[i] = NULL
+    free(arr)
+    arr = NULL
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef void printarr(double** arr, int rows, int cols):
+    for i in range(rows):
+        for j in range(cols):
+            print(f"{arr[i][j]:.9f}", end="\t")
+        print()
+
+
+@cython.boundscheck(False)
+@cython.wraparound(False)
+cdef double** overlap(Molecule molecule) nogil:
     cdef int i, j, k, l
     cdef int nbasis = molecule.nr_atoms
-    cdef double[:,::1] S = np.zeros([nbasis, nbasis])
+    cdef double** S = zeros(nbasis, nbasis)
     cdef int nprimitives_i, nprimitives_j 
     cdef double N, p, q, Q2
     cdef double[3] Q
-    
+    #
     for i in range(nbasis):
         for j in range(nbasis):
-            
             nprimitives_i = (molecule.atoms[i].nr_functions)
             nprimitives_j = (molecule.atoms[j].nr_functions)
-            
             for k in range(nprimitives_i):
-                for l in range(nprimitives_j):
-                    
+                for l in range(nprimitives_j):         
                     N = molecule.atoms[i].functions[k].A * molecule.atoms[j].functions[l].A
                     p = molecule.atoms[i].functions[k].alpha + molecule.atoms[j].functions[l].alpha
                     q = molecule.atoms[i].functions[k].alpha * molecule.atoms[j].functions[l].alpha / p
                     Q = sub3(molecule.atoms[i].functions[k].coordinates, molecule.atoms[j].functions[l].coordinates)
                     Q2 = dot3(Q,Q)
-                    S[i,j] += N * molecule.atoms[i].functions[k].coeff * molecule.atoms[j].functions[l].coeff * exp(-q*Q2) * (pi/p)**(3/2)
+                    S[i][j] += N * molecule.atoms[i].functions[k].coeff * molecule.atoms[j].functions[l].coeff * exp(-q*Q2) * (pi/p)**(3/2)
     return S
 
-##
+##################################################
+##################################################
 # Hydrogen STO-3G basis
 #      alphas and coeffs
 #      0.3425250914E+01       0.1543289673E+00
 #      0.6239137298E+00       0.5353281423E+00
 #      0.1688554040E+00       0.4446345422E+00
-##
 #create hydrogen test unit for structs
+##################################################
+##################################################
 
 cdef double[3] Hcoords1 = [0,0,0]
-cdef double[3] Hcoords2 = [0,0,1.4]
+cdef double[3] Hcoords2 = [2,0,0]
 cdef double[::1] Halphas = np.array([0.3425250914E+01,0.6239137298E+00,0.1688554040E+00])
 cdef double[::1] Hcoeffs = np.array([0.1543289673E+00,0.5353281423E+00,0.4446345422E+00])
 cdef Atom Hydrogen1 = create_atom(Halphas, Hcoeffs, Hcoords1, 3)
@@ -156,11 +186,11 @@ atomlist[0] = Hydrogen1
 atomlist[1] = Hydrogen2
 cdef Molecule H2 = create_molecule(atomlist, 2)
 
-a = overlap(H2)
+cdef double** test = overlap(H2)
 
-print(np.asarray(a))
-
+printarr(test, H2.nr_atoms, H2.nr_atoms)
 
 free_Molecule(H2)
 free(atomlist)
 atomlist = NULL
+free_2D(test, H2.nr_atoms)
