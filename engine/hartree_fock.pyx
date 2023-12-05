@@ -148,7 +148,7 @@ cdef double** overlap(Molecule molecule) nogil:
     cdef double** S = zeros(nbasis, nbasis)
     cdef int nprimitives_i, nprimitives_j 
     cdef double N, p, q, Q2
-    cdef double[3] Q
+    cdef double* Q
     #
     for i in range(nbasis):
         for j in range(nbasis):
@@ -163,6 +163,75 @@ cdef double** overlap(Molecule molecule) nogil:
                     Q2 = dot3(Q,Q)
                     S[i][j] += N * molecule.atoms[i].functions[k].coeff * molecule.atoms[j].functions[l].coeff * exp(-q*Q2) * (pi/p)**(3/2)
     return S
+
+cdef double** kinetic(Molecule molecule):
+    cdef int i, j, k, l
+    cdef int nbasis = molecule.nr_atoms
+    cdef int nprimitives_i, nprimitives_j
+    cdef double** T = zeros(nbasis, nbasis)
+    cdef double N, cacb, alpha, p, PGx2, PGy2, PGz2, q, Q2, s
+    cdef double* PG = <double*>malloc(3 * sizeof(double))
+    cdef double* Q = <double*>malloc(3 * sizeof(double))
+    cdef double* P = <double*>malloc(3 * sizeof(double))
+    cdef double* Pp = <double*>malloc(3 * sizeof(double))
+    
+    
+    
+    for i in range(nbasis):
+        for j in range(nbasis):
+
+            nprimitives_i = molecule.atoms[i].nr_functions
+            nprimitives_j = molecule.atoms[j].nr_functions
+            
+            for k in range(nprimitives_i):
+                for l in range(nprimitives_j):
+                    N = molecule.atoms[i].functions[k].A * molecule.atoms[j].functions[l].A
+                    cacb = molecule.atoms[i].functions[k].coeff * molecule.atoms[j].functions[l].coeff
+                    p   = molecule.atoms[i].functions[k].alpha + molecule.atoms[j].functions[l].alpha
+                    
+                    P[0] = molecule.atoms[i].functions[k].alpha * molecule.atoms[i].functions[k].coordinates[0] + \
+                        molecule.atoms[j].functions[l].alpha * molecule.atoms[j].functions[l].coordinates[0]
+                    P[1] = molecule.atoms[i].functions[k].alpha * molecule.atoms[i].functions[k].coordinates[1] + \
+                        molecule.atoms[j].functions[l].alpha * molecule.atoms[j].functions[l].coordinates[1]
+                    P[2] = molecule.atoms[i].functions[k].alpha * molecule.atoms[i].functions[k].coordinates[2] + \
+                        molecule.atoms[j].functions[l].alpha * molecule.atoms[j].functions[l].coordinates[2]
+                    
+                    Pp[0] = P[0]/p
+                    Pp[1] = P[1]/p
+                    Pp[2] = P[2]/p
+                    
+                    PG[0] = Pp[0] - molecule.atoms[j].functions[l].coordinates[0]
+                    PG[1] = Pp[1] - molecule.atoms[j].functions[l].coordinates[1]
+                    PG[2] = Pp[2] - molecule.atoms[j].functions[l].coordinates[2]
+                    
+                    PGx2 = PG[0]*PG[0]
+                    PGy2 = PG[1]*PG[1]
+                    PGz2 = PG[2]*PG[2]
+                    
+                    q = molecule.atoms[i].functions[k].alpha * molecule.atoms[j].functions[l].alpha / p
+                    
+                    Q[0] = molecule.atoms[i].functions[k].coordinates[0] - molecule.atoms[j].functions[l].coordinates[0]
+                    Q[1] = molecule.atoms[i].functions[k].coordinates[1] - molecule.atoms[j].functions[l].coordinates[1]
+                    Q[2] = molecule.atoms[i].functions[k].coordinates[2] - molecule.atoms[j].functions[l].coordinates[2]
+                    
+                    Q2 = dot3(Q, Q)
+                    
+                    s = exp(-q*Q2) * (pi/p)**(3/2) * N * cacb
+                    
+                    T[i][j] += 3.0 * molecule.atoms[j].functions[l].alpha * s
+                    T[i][j] -= 2.0 * molecule.atoms[j].functions[l].alpha * molecule.atoms[j].functions[l].alpha * s * (PGx2 + 0.5/p)
+                    T[i][j] -= 2.0 * molecule.atoms[j].functions[l].alpha * molecule.atoms[j].functions[l].alpha * s * (PGy2 + 0.5/p)
+                    T[i][j] -= 2.0 * molecule.atoms[j].functions[l].alpha * molecule.atoms[j].functions[l].alpha * s * (PGz2 + 0.5/p)
+                    
+    free(PG)
+    free(Q)
+    free(P)
+    free(Pp)
+    PG = NULL
+    Q = NULL
+    P = NULL
+    Pp = NULL
+    return T
 
 ##################################################
 ##################################################
@@ -186,7 +255,7 @@ atomlist[0] = Hydrogen1
 atomlist[1] = Hydrogen2
 cdef Molecule H2 = create_molecule(atomlist, 2)
 
-cdef double** test = overlap(H2)
+cdef double** test = kinetic(H2)
 
 printarr(test, H2.nr_atoms, H2.nr_atoms)
 
